@@ -4,6 +4,7 @@ const router = express.Router();
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
+const Post = require('../../models/Post');
 const { check, validationResult } = require('express-validator');
 var bodyParser = require('body-parser');
 //var app = express();
@@ -17,8 +18,7 @@ router.use(bodyParser.json());
         try{
                 const profile = await Profile.findOne({ user: req.user.id }).populate('user',
                 ['name','avatar']);
-                // console.log(profile);
-
+              
                 if(!profile) {
                     return res.status(400).json({ msg:'There is no profile for this user'});
                 }
@@ -71,7 +71,7 @@ router.use(bodyParser.json());
         if(status) profileFields.status = status;
         if(githubusername) profileFields.githubusername = githubusername;
         if(skills) {
-            profileFields.skills = skills.split(',').map(skill => skill.trim());
+            profileFields.skills = skills.toString().split(',').map(skill => skill.trim());
         }
     
 
@@ -141,7 +141,7 @@ router.get(
 router.delete('/', auth, async (req, res) => {
     try {
     //   // Remove user posts
-    //   await Post.deleteMany({ user: req.user.id });
+      await Post.deleteMany({ user: req.user.id });
       // Remove profile
       await Profile.findOneAndRemove({ user: req.user.id });
       // Remove user
