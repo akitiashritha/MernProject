@@ -1,53 +1,44 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Moment from 'react-moment';
-import { deleteComment } from '../../actions/post';
+import { addComment } from '../../actions/post';
 
-const CommentItem = ({
-  postId,
-  comment: { _id, text, name, avatar, user, date },
-  auth,
-  deleteComment
-}) => (
-  <div className='post bg-white p-1 my-1'>
-    <div>
-      <Link to={`/profile/${user}`}>
-        <img className='round-img' src={avatar} alt='' />
-        <h4>{name}</h4>
-      </Link>
-    </div>
-    <div>
-      <p className='my-1'>{text}</p>
-      <p className='post-date'>
-        Posted on <Moment format='YYYY/MM/DD'>{date}</Moment>
-      </p>
-      {!auth.loading && user === auth.user._id && (
-        <button
-          onClick={() => deleteComment(postId, _id)}
-          type='button'
-          className='btn btn-danger'
-        >
-          <i className='fas fa-times' />
-        </button>
-      )}
-    </div>
-  </div>
-);
+const CommentForm = ({ postId, addComment }) => {
+  const [text, setText] = useState('');
 
-CommentItem.propTypes = {
-  postId: PropTypes.string.isRequired,
-  comment: PropTypes.object.isRequired,
-  auth: PropTypes.object.isRequired,
-  deleteComment: PropTypes.func.isRequired
+  return (
+    <div className='post-form'>
+      <div className='bg-primary p'>
+        <h3>Leave a Comment</h3>
+      </div>
+      <form
+        className='form my-1'
+        onSubmit={e => {
+          e.preventDefault();
+          addComment(postId, { text });
+          setText('');
+        }}
+      >
+        <textarea
+          name='text'
+          cols='30'
+          rows='5'
+          placeholder='Comment the post'
+          value={text}
+          onChange={e => setText(e.target.value)}
+          required
+        />
+        <input type='submit' className='btn btn-dark my-1' value='Submit' />
+      </form>
+    </div>
+  );
 };
 
-const mapStateToProps = state => ({
-  auth: state.auth
-});
+CommentForm.propTypes = {
+  addComment: PropTypes.func.isRequired
+};
 
 export default connect(
-  mapStateToProps,
-  { deleteComment }
-)(CommentItem);
+  null,
+  { addComment }
+)(CommentForm);
